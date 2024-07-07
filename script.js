@@ -1,73 +1,61 @@
-const weatherApiKey = process.env.WEATHER_API_KEY;
-const newsApiKey = process.env.NEWS_API_KEY;
-
-// Functie om de huidige datum te laden en weer te geven
 function loadDate() {
-  var currentDate = new Date();
-  var dateString = currentDate
-    .toString()
-    .split(' ')
-    .splice(0, 4) // Beperk de string tot de eerste vier woorden
-    .join(' ');
+    var currentDate = new Date()
+    var dateString = currentDate
+        .toString()
+        .split(' ')
+        .splice(0, 4)
+        .join(' ')
 
-  $('#date').text(dateString);
+    $('#date').text(dateString)
 }
 
-// Functie om het weer te laden en weer te geven
 function loadWeather() {
-  var weather = $('#weather');
-  var url = 'https://api.weatherapi.com/v1/current.json'; // WeatherAPI URL
-  var apiKey = weatherApiKey; // Vervang door je eigen WeatherAPI sleutel
+    var weather = $('#weather')
+    var url = 'https://api.openweathermap.org/data/2.5/weather' // OpenWeather API url
+    var apiKey = 'YOUR API' // API key from OpenWeather
 
-  // Functie die wordt aangeroepen bij succesvolle geolocatie
-  function success(position) {
-    var latitude = position.coords.latitude; // Breedtegraad via geolocatie
-    var longitude = position.coords.longitude; // Lengtegraad via geolocatie
+    function success(position) {
+        var latitude = position.coords.latitude
+        var longitude = position.coords.longitude
 
-    // API-aanroep:
-    $.getJSON(
-      url + '?key=' + apiKey + '&q=' + latitude + ',' + longitude,
-      function (data) {
-        weather.text(
-          'Gebaseerd op je huidige locatie is het nu ' + data.current.temp_f + '°F'
-        );
-      }
-    );
-  }
+        $.getJSON(
+            url + '?units=imperial&lat=' + latitude + '&lon=' + longitude + '&appid=' + apiKey,
+            function(data) {
+                weather.text(
+                    'Based on your current location, it is ' +
+                    data.main.temp +
+                    '° F right now'
+                )
+            }
+        )
+    }
 
-  // Bericht dat wordt weergegeven bij een geolocatiefout
-  function error() {
-    alert('Kan je locatie niet ophalen voor weerinformatie');
-  }
+    function error() {
+        alert('Unable to retrieve your location for weather')
+    }
 
-  // Aanroepen van de geolocatie API
-  navigator.geolocation.getCurrentPosition(success, error);
+    navigator.geolocation.getCurrentPosition(success, error)
 
-  // De tekst die wordt weergegeven terwijl de functie de aanvraag doet
-  weather.text('Weer ophalen…');
+    weather.text('fetching weather...')
 }
 
-// Functie om het nieuws te laden en weer te geven
 function loadNews() {
-  var news = $('#news');
-  var url = 'https://newsapi.org/v2/top-headlines?sources=the-next-web&apiKey='; // News API URL
-  var apiKey = newsApiKey; // Vervang door je eigen News API sleutel
+    var news = $('#news')
+    var url =
+        'https://newsapi.org/v2/top-headlines?sources=the-next-web&apiKey='
+    var apiKey = 'YOUR API'
 
-  $.getJSON(url + apiKey, function (data) {
-    // map() methode om artikel URLs en titels op te halen
-    var titles = data.articles.map(function (article) {
-      return "<a href='" + article.url + "'>" + article.title + '</a>';
-    });
+    $.getJSON(url + apiKey, function(data) {
+        var titles = data.articles.map(function(articles) {
+            return "<a href='" + articles.url + "'>" + articles.title + '</a>'
+        })
 
-    // Titels samenvoegen met twee regeleindes
-    news.html(titles.join('<br><br>'));
-  });
+        news.html(titles.join('<br><br>'))
+    })
 
-  // De tekst die wordt weergegeven terwijl de functie de aanvraag doet
-  news.text('Nieuws ophalen…');
+    news.text('fetching news...')
 }
 
-// Functies aanroepen
-loadDate();
-loadWeather();
-loadNews();
+loadDate()
+loadWeather()
+loadNews()
